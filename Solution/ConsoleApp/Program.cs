@@ -4,83 +4,45 @@ class Program
 {
     public static void Main(string[] args)
     {
-        int[] nums1 = { 1, 3 };
-        int[] nums2 = { 2 };
         Solution solution = new Solution();
-        double result = solution.FindMedianSortedArrays(nums1, nums2);
-        Console.WriteLine(result);
+        Console.WriteLine(solution.LongestPalindrome("babad")); // خروجی: "bab" یا "aba"
+        Console.WriteLine(solution.LongestPalindrome("cbbd"));  // خروجی: "bb"
 
     }
 
     public class Solution
-{
-    public double FindMedianSortedArrays(int[] nums1, int[] nums2)
     {
-        // اطمینان از اینکه nums1 کوتاه‌تر از nums2 است
-        if (nums1.Length > nums2.Length)
-            return FindMedianSortedArrays(nums2, nums1);
-
-        int m = nums1.Length;
-        int n = nums2.Length;
-        int halfLen = (m + n + 1) / 2;
-        int minIndex = 0, maxIndex = m;
-
-        while (minIndex <= maxIndex)
+        public string LongestPalindrome(string s)
         {
-            int i = (minIndex + maxIndex) / 2;
-            int j = halfLen - i;
+            if (string.IsNullOrEmpty(s) || s.Length < 1) return "";
 
-            if (i < m && nums2[j - 1] > nums1[i])
+            int start = 0, end = 0;
+
+            for (int i = 0; i < s.Length; i++)
             {
-                minIndex = i + 1;  // افزایش i برای جستجو بیشتر
-            }
-            else if (i > 0 && nums1[i - 1] > nums2[j])
-            {
-                maxIndex = i - 1;  // کاهش i برای جستجو کمتر
-            }
-            else
-            {
-                // حالت مطلوب را پیدا کردیم
-                int maxOfLeft;
-                if (i == 0)
-                {
-                    maxOfLeft = nums2[j - 1];
-                }
-                else if (j == 0)
-                {
-                    maxOfLeft = nums1[i - 1];
-                }
-                else
-                {
-                    maxOfLeft = Math.Max(nums1[i - 1], nums2[j - 1]);
-                }
+                int len1 = ExpandFromCenter(s, i, i);       // گسترش از یک کاراکتر (پالیندروم‌های با طول فرد)
+                int len2 = ExpandFromCenter(s, i, i + 1);   // گسترش از دو کاراکتر (پالیندروم‌های با طول زوج)
+                int len = Math.Max(len1, len2);             // انتخاب پالیندروم با طول بیشتر
 
-                if ((m + n) % 2 == 1)
-                {
-                    return maxOfLeft; // اگر تعداد کل عناصر فرد باشد، میانه maxOfLeft خواهد بود
+                if (len > end - start)
+                {                    // به‌روزرسانی طولانی‌ترین پالیندروم
+                    start = i - (len - 1) / 2;
+                    end = i + len / 2;
                 }
-
-                int minOfRight;
-                if (i == m)
-                {
-                    minOfRight = nums2[j];
-                }
-                else if (j == n)
-                {
-                    minOfRight = nums1[i];
-                }
-                else
-                {
-                    minOfRight = Math.Min(nums1[i], nums2[j]);
-                }
-
-                return (maxOfLeft + minOfRight) / 2.0; // اگر تعداد کل عناصر زوج باشد، میانه میانگین maxOfLeft و minOfRight است
             }
+
+            return s.Substring(start, end - start + 1);     // استخراج زیررشته پالیندروم
         }
 
-        throw new ArgumentException("Input arrays are not valid");
+        private int ExpandFromCenter(string s, int left, int right)
+        {
+            while (left >= 0 && right < s.Length && s[left] == s[right])
+            {
+                left--;
+                right++;
+            }
+            return right - left - 1;
+        }
     }
-}
 
 }
- 
