@@ -1,48 +1,82 @@
-﻿using System;
-
-class Program
+﻿public class Program
 {
     public static void Main(string[] args)
     {
+        // Create a Solution instance
         Solution solution = new Solution();
-        Console.WriteLine(solution.LongestPalindrome("babad")); // خروجی: "bab" یا "aba"
-        Console.WriteLine(solution.LongestPalindrome("cbbd"));  // خروجی: "bb"
 
+        // Example 1
+        IList<string> dictionary1 = new List<string> { "cat", "bat", "rat" };
+        string sentence1 = "the cattle was rattled by the battery";
+        Console.WriteLine("Output 1: " + solution.ReplaceWords(dictionary1, sentence1));
+
+        // Example 2
+        IList<string> dictionary2 = new List<string> { "a", "b", "c" };
+        string sentence2 = "aadsfasf absbs bbab cadsfafs";
+        Console.WriteLine("Output 2: " + solution.ReplaceWords(dictionary2, sentence2));
+
+        // Add more test cases if needed
     }
-
-    public class Solution
-    {
-        public string LongestPalindrome(string s)
-        {
-            if (string.IsNullOrEmpty(s) || s.Length < 1) return "";
-
-            int start = 0, end = 0;
-
-            for (int i = 0; i < s.Length; i++)
-            {
-                int len1 = ExpandFromCenter(s, i, i);       // گسترش از یک کاراکتر (پالیندروم‌های با طول فرد)
-                int len2 = ExpandFromCenter(s, i, i + 1);   // گسترش از دو کاراکتر (پالیندروم‌های با طول زوج)
-                int len = Math.Max(len1, len2);             // انتخاب پالیندروم با طول بیشتر
-
-                if (len > end - start)
-                {                    // به‌روزرسانی طولانی‌ترین پالیندروم
-                    start = i - (len - 1) / 2;
-                    end = i + len / 2;
-                }
-            }
-
-            return s.Substring(start, end - start + 1);     // استخراج زیررشته پالیندروم
-        }
-
-        private int ExpandFromCenter(string s, int left, int right)
-        {
-            while (left >= 0 && right < s.Length && s[left] == s[right])
-            {
-                left--;
-                right++;
-            }
-            return right - left - 1;
-        }
-    }
-
 }
+
+
+public class Solution
+    {
+        public string ReplaceWords(IList<string> dictionary, string sentence)
+        {
+            // Step 1: Build the Trie from the dictionary
+            TrieNode root = new TrieNode();
+            foreach (var word in dictionary)
+            {
+                InsertWord(root, word);
+            }
+
+            // Step 2: Process each word in the sentence
+            var words = sentence.Split(' ');
+            for (int i = 0; i < words.Length; i++)
+            {
+                words[i] = FindRoot(root, words[i]);
+            }
+
+            // Step 3: Join the words to form the final sentence
+            return string.Join(" ", words);
+        }
+
+        private void InsertWord(TrieNode root, string word)
+        {
+            var node = root;
+            foreach (var ch in word)
+            {
+                if (!node.Children.ContainsKey(ch))
+                {
+                    node.Children[ch] = new TrieNode();
+                }
+                node = node.Children[ch];
+            }
+            node.IsWord = true;
+        }
+
+        private string FindRoot(TrieNode root, string word)
+        {
+            var node = root;
+            var prefix = new System.Text.StringBuilder();
+
+            foreach (var ch in word)
+            {
+                if (!node.Children.ContainsKey(ch) || node.IsWord)
+                {
+                    break;
+                }
+                prefix.Append(ch);
+                node = node.Children[ch];
+            }
+
+            return node.IsWord ? prefix.ToString() : word;
+        }
+    }
+
+    public class TrieNode
+    {
+        public Dictionary<char, TrieNode> Children = new Dictionary<char, TrieNode>();
+        public bool IsWord = false;
+    }
