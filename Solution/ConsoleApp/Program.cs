@@ -2,81 +2,51 @@
 {
     public static void Main(string[] args)
     {
-        // Create a Solution instance
+        // Example test case
+        int[] nums = { 0, 1, 1, 3 };
+        int maximumBit = 2;
+
+        // Create an instance of the Solution class
         Solution solution = new Solution();
 
-        // Example 1
-        IList<string> dictionary1 = new List<string> { "cat", "bat", "rat" };
-        string sentence1 = "the cattle was rattled by the battery";
-        Console.WriteLine("Output 1: " + solution.ReplaceWords(dictionary1, sentence1));
+        // Get the maximum XOR results
+        int[] result = solution.GetMaximumXor(nums, maximumBit);
 
-        // Example 2
-        IList<string> dictionary2 = new List<string> { "a", "b", "c" };
-        string sentence2 = "aadsfasf absbs bbab cadsfafs";
-        Console.WriteLine("Output 2: " + solution.ReplaceWords(dictionary2, sentence2));
-
-        // Add more test cases if needed
+        // Print the results
+        Console.WriteLine("Output:");
+        foreach (int value in result)
+        {
+            Console.Write(value + " ");
+        }
     }
 }
 
-
 public class Solution
+{
+    public int[] GetMaximumXor(int[] nums, int maximumBit)
     {
-        public string ReplaceWords(IList<string> dictionary, string sentence)
+        int n = nums.Length;
+        int[] answer = new int[n];
+
+        // Calculate the XOR of all elements in the array
+        int xorTotal = 0;
+        foreach (int num in nums)
         {
-            // Step 1: Build the Trie from the dictionary
-            TrieNode root = new TrieNode();
-            foreach (var word in dictionary)
-            {
-                InsertWord(root, word);
-            }
-
-            // Step 2: Process each word in the sentence
-            var words = sentence.Split(' ');
-            for (int i = 0; i < words.Length; i++)
-            {
-                words[i] = FindRoot(root, words[i]);
-            }
-
-            // Step 3: Join the words to form the final sentence
-            return string.Join(" ", words);
+            xorTotal ^= num;
         }
 
-        private void InsertWord(TrieNode root, string word)
+        // Calculate the maximum possible XOR value with maximumBit bits
+        int maximumXor = (1 << maximumBit) - 1;
+
+        // Process each query in reverse order
+        for (int i = 0; i < n; i++)
         {
-            var node = root;
-            foreach (var ch in word)
-            {
-                if (!node.Children.ContainsKey(ch))
-                {
-                    node.Children[ch] = new TrieNode();
-                }
-                node = node.Children[ch];
-            }
-            node.IsWord = true;
+            // Find k that maximizes the XOR result
+            answer[i] = xorTotal ^ maximumXor;
+            // Remove the last element of nums from xorTotal
+            xorTotal ^= nums[n - 1 - i];
         }
 
-        private string FindRoot(TrieNode root, string word)
-        {
-            var node = root;
-            var prefix = new System.Text.StringBuilder();
-
-            foreach (var ch in word)
-            {
-                if (!node.Children.ContainsKey(ch) || node.IsWord)
-                {
-                    break;
-                }
-                prefix.Append(ch);
-                node = node.Children[ch];
-            }
-
-            return node.IsWord ? prefix.ToString() : word;
-        }
+        return answer;
     }
-
-    public class TrieNode
-    {
-        public Dictionary<char, TrieNode> Children = new Dictionary<char, TrieNode>();
-        public bool IsWord = false;
-    }
+}
