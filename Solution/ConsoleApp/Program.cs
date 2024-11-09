@@ -2,32 +2,30 @@
 
 class Program
 {
-    static int BinarySearch(int[] arr, int target)
+    static int LinearSearch(int[] arr, int target)
     {
-        int left = 0;
-        int right = arr.Length - 1;
-
-        while (left <= right)
+        for (int i = 0; i < arr.Length; i++)
         {
-            int mid = left + (right - left) / 2;
-
-            if (arr[mid] == target)
-                return mid;
-            if (arr[mid] < target)
-                left = mid + 1;
-            else
-                right = mid - 1;
+            // Check if the current element matches the target
+            if (arr[i] == target)
+            {
+                return i; // Return the index if found
+            }
         }
 
-        return -1;  // Target not present in array
+        return -1; // Return -1 if target is not found in the array
     }
 
     static void Main()
     {
-        int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        int target = 7;
+        int[] arr = { 7, 2, 9, 4, 3, 8, 5 };
+        int target = 4;
 
-        int result = BinarySearch(arr, target);
-        Console.WriteLine(result != -1 ? $"Element found at index {result}" : "Element not present in array");
+        int result = LinearSearch(arr, target);
+
+        if (result == -1)
+            Console.WriteLine("Element not present in array");
+        else
+            Console.WriteLine("Element found at index " + result);
     }
 }
