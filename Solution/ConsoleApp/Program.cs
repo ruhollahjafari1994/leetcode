@@ -1,52 +1,33 @@
-﻿public class Program
+﻿using System;
+
+class Program
 {
-    public static void Main(string[] args)
+    static int BinarySearch(int[] arr, int target)
     {
-        // Example test case
-        int[] nums = { 0, 1, 1, 3 };
-        int maximumBit = 2;
+        int left = 0;
+        int right = arr.Length - 1;
 
-        // Create an instance of the Solution class
-        Solution solution = new Solution();
-
-        // Get the maximum XOR results
-        int[] result = solution.GetMaximumXor(nums, maximumBit);
-
-        // Print the results
-        Console.WriteLine("Output:");
-        foreach (int value in result)
+        while (left <= right)
         {
-            Console.Write(value + " ");
+            int mid = left + (right - left) / 2;
+
+            if (arr[mid] == target)
+                return mid;
+            if (arr[mid] < target)
+                left = mid + 1;
+            else
+                right = mid - 1;
         }
+
+        return -1;  // Target not present in array
     }
-}
 
-public class Solution
-{
-    public int[] GetMaximumXor(int[] nums, int maximumBit)
+    static void Main()
     {
-        int n = nums.Length;
-        int[] answer = new int[n];
+        int[] arr = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        int target = 7;
 
-        // Calculate the XOR of all elements in the array
-        int xorTotal = 0;
-        foreach (int num in nums)
-        {
-            xorTotal ^= num;
-        }
-
-        // Calculate the maximum possible XOR value with maximumBit bits
-        int maximumXor = (1 << maximumBit) - 1;
-
-        // Process each query in reverse order
-        for (int i = 0; i < n; i++)
-        {
-            // Find k that maximizes the XOR result
-            answer[i] = xorTotal ^ maximumXor;
-            // Remove the last element of nums from xorTotal
-            xorTotal ^= nums[n - 1 - i];
-        }
-
-        return answer;
+        int result = BinarySearch(arr, target);
+        Console.WriteLine(result != -1 ? $"Element found at index {result}" : "Element not present in array");
     }
 }
