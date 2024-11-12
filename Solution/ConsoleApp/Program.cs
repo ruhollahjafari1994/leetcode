@@ -1,50 +1,35 @@
 ﻿using System;
+
 public class Solution
 {
-    public bool ParseBoolExpr(string expression)
+    public char FindKthBit(int n, int k)
     {
-        Stack<char> stack = new Stack<char>();
+        return FindBit(n, k);
+    }
 
-        foreach (char c in expression)
+    private char FindBit(int n, int k)
+    {
+        if (n == 1)
         {
-            if (c == ')')
-            {  // End of an expression
-                List<char> operands = new List<char>();
-
-                // Pop until we get to the start of the expression
-                while (stack.Peek() != '(')
-                {
-                    operands.Add(stack.Pop());
-                }
-                stack.Pop();  // Remove the '('
-                char operatorChar = stack.Pop();  // Get the operator before '('
-
-                bool result;
-                if (operatorChar == '&')
-                {
-                    result = operands.All(op => op == 't');
-                }
-                else if (operatorChar == '|')
-                {
-                    result = operands.Any(op => op == 't');
-                }
-                else
-                { // operatorChar == '!'
-                    result = operands[0] == 'f';
-                }
-
-                // Push result back as 't' for true or 'f' for false
-                stack.Push(result ? 't' : 'f');
-            }
-            else if (c == 't' || c == 'f' || c == '!' || c == '&' || c == '|' || c == '(')
-            {
-                stack.Push(c);
-            }
-            // Ignore commas as they are separators
+            return '0';
         }
 
-        // The result will be the only item left in the stack
-        return stack.Pop() == 't';
+        int length = (1 << n) - 1;  // length of S_n is 2^n - 1
+        int mid = length / 2 + 1;   // middle position of S_n
+
+        if (k == mid)
+        {
+            return '1';
+        }
+        else if (k < mid)
+        {
+            return FindBit(n - 1, k);
+        }
+        else
+        {
+            int mirroredK = length - k + 1;
+            return FindBit(n - 1, mirroredK) == '0' ? '1' : '0';
+        }
     }
 }
 
@@ -55,14 +40,17 @@ class Program
         Solution solution = new Solution();
 
         // Test cases
-        string expression1 = "&(|(f))";
-        string expression2 = "|(f,f,f,t)";
-        string expression3 = "!(&(f,t))";
+        int n1 = 3, k1 = 1;
+        Console.WriteLine($"The {k1}-th bit in S{n1} is: {solution.FindKthBit(n1, k1)}");  // Expected output: '0'
 
-        // Printing the results
-        Console.WriteLine("Expression: " + expression1 + " => " + solution.ParseBoolExpr(expression1)); // Expected: false
-        Console.WriteLine("Expression: " + expression2 + " => " + solution.ParseBoolExpr(expression2)); // Expected: true
-        Console.WriteLine("Expression: " + expression3 + " => " + solution.ParseBoolExpr(expression3)); // Expected: true
+        int n2 = 4, k2 = 11;
+        Console.WriteLine($"The {k2}-th bit in S{n2} is: {solution.FindKthBit(n2, k2)}");  // Expected output: '1'
 
+        // Additional tests
+        int n3 = 5, k3 = 16;
+        Console.WriteLine($"The {k3}-th bit in S{n3} is: {solution.FindKthBit(n3, k3)}");  // You can add expected output if known
+
+        int n4 = 20, k4 = 524287;
+        Console.WriteLine($"The {k4}-th bit in S{n4} is: {solution.FindKthBit(n4, k4)}");  // Check for edge cases
     }
 }
